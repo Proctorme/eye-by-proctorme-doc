@@ -193,6 +193,7 @@ Content-Type: `application/json`
   "examId": "64fe2eaa...",
   "type": "FACE_ABSENCE",
   "mediaUrl": "https://s3.amazonaws.com/.../screenshot.jpg",
+"domain": "https://mydomain.com",
   "description": "Candidate left the desk",
   "createdAt": "2025-09-21T12:00:00.000Z"
 }
@@ -207,6 +208,7 @@ Content-Type: `application/json`
   "examId": "p77qkyfp",
   "type": "SOUND_DETECTED",
   "mediaUrl": "https://proctor-module.s3.amazonaws.com/sound_detected.ogg",
+"domain": "https://mydomain.com",
   "description": "Unexpected sound detected",
   "createdAt": "2025-09-24T20:04:02.080Z"
 }
@@ -217,9 +219,10 @@ Content-Type: `application/json`
 - `event` — Type of event that was triggered
 - `flagId` — ObjectId of the flag
 - `candidateId` — ID of the candidate associated with the flag
-- `examId` — ID of the exam associated with the flag
+- `examId` — ID of the exam / assessment associated with the flag
 - `type` — string describing the flag type (enum-like)
 - `mediaUrl` — optional URL to media (image/audio)
+- `domain` - domain of the assessment platform 
 - `description` — optional text describing the event
 - `createdAt` — timestamp when the flag was created
 
