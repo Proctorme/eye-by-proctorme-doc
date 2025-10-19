@@ -117,6 +117,26 @@ See the [live demo](https://eyebyproctorme-sandbox.netlify.app).
 
 ## Events
 
+### Payload return types
+```typescript
+type FlagData = {
+    examId: string;         // assessment Id
+    candidateId: string;    // candidate Id
+    type: Event;            // log Event type
+    description: string;    // log description 
+    createdAt: string;      // time of occurrence
+}
+
+type FlagDataWithFile = {
+    examId: string;         // assessment Id
+    candidateId: string;    // candidate Id
+    mediaFile:File          // File (image or audio)
+    type: Event;            // log Event type
+    description: string;    // log description 
+    createdAt: string;      // time of occurrence
+}
+```
+
 | Event               | Description                                       | Example Payload                         |
 | ------------------- | ------------------------------------------------- | --------------------------------------- |
 | `STARTED`           | Fired when proctoring begins.                     | –                                       |
@@ -124,12 +144,14 @@ See the [live demo](https://eyebyproctorme-sandbox.netlify.app).
 | `SET_CONFIG`        | Fired when widget config is set.                  | `{ config: {...} }`                     |
 | `FULLSCREEN_CHANGE` | Fired when fullscreen mode changes.               | `{ fullscreen: true }`                  |
 | `TAB_FOCUS_CHANGE`  | Fired when tab focus state changes.               | `{ focused: true/false }`               |
-| `EXIT_FULLSCREEN`   | Fired when exiting fullscreen mode.               | –                                       |
-| `TAB_NOT_FOCUS`     | Fired when candidate switches tab or loses focus. | `{ focused: false }`                    |
-| `FACE_ABSENCE`      | Fired when no face is detected.                   | `{ dataBlob: Blob, type: 'image/png' }` |
-| `MULTIPLE_FACE`     | Fired when multiple faces are detected.           | `{ dataBlob: Blob, type: 'image/png' }` |
-| `SOUND_DETECTED`    | Fired when sound is detected.                     | `{ dataBlob: Blob, type: 'audio/ogg' }` |
-| `PERIODIC_SNAPSHOT` | Fired periodically with a snapshot of the user.   | `{ dataBlob: Blob, type: 'image/png' }` |
+| `EXIT_FULLSCREEN`   | Fired when exiting fullscreen mode.               |   `  FlagData  `                        |
+| `TAB_NOT_FOCUS`     | Fired when candidate switches tab or loses focus. | `  FlagData  `                          |
+| `FACE_ABSENCE`      | Fired when no face is detected.                   | `  FlagDataWithFile  `                  |
+| `MULTIPLE_FACE`     | Fired when multiple faces are detected.           | `  FlagDataWithFile  `                  |
+| `SOUND_DETECTED`    | Fired when sound is detected.                     | `  FlagDataWithFile  `                  |
+| `PERIODIC_SNAPSHOT` | Fired periodically with a snapshot of the user.   | `  FlagDataWithFile  `                  |
+| `SYSTEM_CHECK_STARTED` | Fired when system checks starts.               | -                                       |
+| `SYSTEM_CHECK_COMPLETED` | Fired periodically with a snapshot of the user.   | `{ status: "success" \| "failed" \| "default";  finished: boolean; name: "internetSpeed" \| "webcam" \| "microphone" \| "browser", }[]` |
 
 ---
 
