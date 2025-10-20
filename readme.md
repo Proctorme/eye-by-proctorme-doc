@@ -135,15 +135,25 @@ type FlagDataWithFile = {
     description: string;    // log description 
     createdAt: string;      // time of occurrence
 }
+
+type SystemCheck= {
+  success: boolean;         // systems check is successful or not
+  timestamp: string;        // time of occurrence
+  data:{                    // data array of all system status
+  status: "success" | "failed" | "default";  
+  finished: boolean; 
+  name: "internetSpeed" | "webcam" | "microphone" | "browser", 
+  }[]
+}
 ```
 
-| Event               | Description                                       | Example Payload                         |
+| Event               | Description                                       |  Payload Type                           |
 | ------------------- | ------------------------------------------------- | --------------------------------------- |
 | `STARTED`           | Fired when proctoring begins.                     | –                                       |
 | `END_PROCTORING`    | Fired when proctoring ends.                       | –                                       |
 | `SET_CONFIG`        | Fired when widget config is set.                  | `{ config: {...} }`                     |
-| `FULLSCREEN_CHANGE` | Fired when fullscreen mode changes.               | `{ fullscreen: true }`                  |
-| `TAB_FOCUS_CHANGE`  | Fired when tab focus state changes.               | `{ focused: true/false }`               |
+| `FULLSCREEN_CHANGE` | Fired when fullscreen mode changes.               | `{ fullscreen: boolean }`               |
+| `TAB_FOCUS_CHANGE`  | Fired when tab focus state changes.               | `{ focused: boolean }`                  |
 | `EXIT_FULLSCREEN`   | Fired when exiting fullscreen mode.               |   `  FlagData  `                        |
 | `TAB_NOT_FOCUS`     | Fired when candidate switches tab or loses focus. | `  FlagData  `                          |
 | `FACE_ABSENCE`      | Fired when no face is detected.                   | `  FlagDataWithFile  `                  |
@@ -151,7 +161,7 @@ type FlagDataWithFile = {
 | `SOUND_DETECTED`    | Fired when sound is detected.                     | `  FlagDataWithFile  `                  |
 | `PERIODIC_SNAPSHOT` | Fired periodically with a snapshot of the user.   | `  FlagDataWithFile  `                  |
 | `SYSTEM_CHECK_STARTED` | Fired when system checks starts.               | -                                       |
-| `SYSTEM_CHECK_COMPLETED` | Fired periodically with a snapshot of the user.   | `{ status: "success" \| "failed" \| "default";  finished: boolean; name: "internetSpeed" \| "webcam" \| "microphone" \| "browser", }[]` |
+| `SYSTEM_CHECK_COMPLETED` | Fired when system checks is completed.       | `  SystemCheck  `                       |
 
 ---
 
