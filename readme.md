@@ -62,6 +62,14 @@ See the [live demo](https://eyebyproctorme-sandbox.netlify.app).
         console.log("Sound detected 🎶", data);
       });
 
+      widget.on("FACE_MISMATCH", (data) => {
+        console.log("Face mismatch detected ❌", data);
+      });
+
+      widget.on("SUSPICIOUS_ACTIVITY", (data) => {
+        console.log("Suspicious activity pattern detected 🚨", data);
+      });
+
       widget.on("TAB_NOT_FOCUS", (data) => {
         console.log("Tab not in focus 💻", data);
       });
@@ -110,8 +118,9 @@ See the [live demo](https://eyebyproctorme-sandbox.netlify.app).
 | Method                       | Description                                |
 | ---------------------------- | ------------------------------------------ |
 | `widget.init(config)`        | Initializes the widget with configuration. |
-| `widget.on(event, callback)` | Listens for widget events.                 |
-| `widget.endProctoring()`     | Manually ends the proctoring session.      |
+| `widget.on(event, callback)`      | Listens for widget events.                                   |
+| `widget.endProctoring()`          | Manually ends the proctoring session.                        |
+| `widget.resetSessionListeners()`  | Clears all public event listeners registered via `widget.on()`. |
 
 ---
 
@@ -155,13 +164,15 @@ type SystemCheck= {
 | `FULLSCREEN_CHANGE` | Fired when fullscreen mode changes.               | `{ fullscreen: boolean }`               |
 | `TAB_FOCUS_CHANGE`  | Fired when tab focus state changes.               | `{ focused: boolean }`                  |
 | `EXIT_FULLSCREEN`   | Fired when exiting fullscreen mode.               |   `  FlagData  `                        |
-| `TAB_NOT_FOCUS`     | Fired when candidate switches tab or loses focus. | `  FlagData  `                          |
-| `FACE_ABSENCE`      | Fired when no face is detected.                   | `  FlagDataWithFile  `                  |
-| `MULTIPLE_FACE`     | Fired when multiple faces are detected.           | `  FlagDataWithFile  `                  |
-| `SOUND_DETECTED`    | Fired when sound is detected.                     | `  FlagDataWithFile  `                  |
-| `PERIODIC_SNAPSHOT` | Fired periodically with a snapshot of the user.   | `  FlagDataWithFile  `                  |
+| `TAB_NOT_FOCUS`     | Fired when candidate switches tab or loses focus. | `FlagData`                          |
+| `FACE_ABSENCE`      | Fired when no face is detected.                   | `FlagDataWithFile`                  |
+| `MULTIPLE_FACE`     | Fired when multiple faces are detected.           | `FlagDataWithFile`                  |
+| `SOUND_DETECTED`    | Fired when sound is detected.                     | `FlagDataWithFile`                  |
+| `PERIODIC_SNAPSHOT` | Fired periodically with a snapshot of the user.   | `FlagDataWithFile`                  |
+| `FACE_MISMATCH` | Fired when face verification detects a mismatch. | `FlagDataWithFile`                  |
+| `SUSPICIOUS_ACTIVITY` | Fired when 5 unique violation types are observed. | `FlagData`                       |
 | `SYSTEM_CHECK_STARTED` | Fired when system checks starts.               | -                                       |
-| `SYSTEM_CHECK_COMPLETED` | Fired when system checks is completed.       | `  SystemCheck  `                       |
+| `SYSTEM_CHECK_COMPLETED` | Fired when system checks is completed.       | `SystemCheck`                       |
 
 ---
 
@@ -187,10 +198,76 @@ type SystemCheck= {
 
 ## Ending a Session
 
-You can manually end the session at any time:
+### `widget.endProctoring()`
 
+Manually ends the proctoring session. This triggers the `END_PROCTORING` event, clears Redux state, purges persisted storage, and closes the modal.
+
+**Example:**
 ```javascript
 widget.endProctoring();
+```
+
+**When to use:**
+Call this when the candidate submits their exam, when the exam time expires, or when you otherwise need to forcibly stop proctoring.
+
+**Important:** After calling `endProctoring()`, you can call `widget.init(newConfig)` to start a new session with different candidate/exam data.
+
+---
+
+### `widget.resetSessionListeners()`
+
+Clears all public event listeners registered via `widget.on()`. Useful when re-initializing the widget or switching sessions to prevent duplicate handlers from firing.
+
+**Example:**
+```javascript
+widget.resetSessionListeners();
+```
+
+
+---
+
+### `FACE_MISMATCH`
+
+Fired when the face verification API detects that the candidate does not match the registered image.
+
+**When to listen:**
+Use this to notify your UI or logs when a face mismatch is detected during the verification step.
+
+**Payload:**
+`FlagDataWithFile` — includes the snapshot image that was used for verification.
+
+**Example:**
+```javascript
+widget.on("FACE_MISMATCH", (data) => {
+  console.log("Face mismatch detected ❌", data);
+});
+```
+
+---
+
+### `SUSPICIOUS_ACTIVITY`
+
+Fired when 5 different unique violation types have been observed in the current session.
+
+**Triggering violations:**
+- `EXIT_FULLSCREEN`
+- `TAB_NOT_FOCUS`
+- `FACE_ABSENCE`
+- `MULTIPLE_FACE`
+- `SOUND_DETECTED`
+- `FACE_MISMATCH`
+- `FACE_MISALIGNMENT`
+
+Only distinct categories count — repeats of the same type are ignored. After firing, the tracker resets and can trigger again in the same session.
+
+**When to listen:**
+Use this to escalate monitoring or notify proctors when a candidate shows a pattern of multiple different suspicious behaviors.
+
+**Example:**
+```javascript
+widget.on("SUSPICIOUS_ACTIVITY", (data) => {
+  console.log("Suspicious activity pattern detected 🚨", data);
+});
 ```
 
 ---
